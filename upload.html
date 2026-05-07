@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Photo • My Photo Gallery</title>
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    :root {
+      --bg1: #0b1020;
+      --bg2: #121a31;
+      --card: rgba(255, 255, 255, 0.08);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f5f7ff;
+      --muted: #b9c3e6;
+      --accent: #7c5cff;
+      --accent2: #00d4ff;
+      --danger: #ff5a7a;
+      --ok: #37d67a;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(0, 212, 255, 0.18), transparent 24%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: var(--shadow);
+    }
+
+    .navlinks {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .navlinks a,
+    .btn {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .navlinks a:hover,
+    .btn:hover {
+      transform: translateY(-1px);
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -1px;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .pillRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sectionTitle {
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      letter-spacing: -0.3px;
+    }
+
+    .modeTabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .modeBtn {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .modeBtn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.24);
+    }
+
+    .formGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .dropzone {
+      border: 1.5px dashed rgba(255, 255, 255, 0.22);
+      border-radius: 18px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      text-align: center;
+      transition: 0.2s ease;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent2);
+      background: rgba(0, 212, 255, 0.08);
+    }
+
+    .dropzone input[type="file"] {
+      margin-top: 10px;
+    }
+
+    .help {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .inlineCheck {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      padding: 0 14px;
+    }
+
+    .inlineCheck input {
+      width: auto;
+      margin: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 16px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      white-space: pre-line;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: rgba(55, 214, 122, 0.12);
+      color: #c8ffe0;
+      border: 1px solid rgba(55, 214, 122, 0.35);
+    }
+
+    .message.error {
+      background: rgba(255, 90, 122, 0.12);
+      color: #ffd6de;
+      border: 1px solid rgba(255, 90, 122, 0.35);
+    }
+
+    .sideList {
+      display: grid;
+      gap: 12px;
+    }
+
+    .infoItem {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .infoItem strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .previewBox {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 18px;
+      padding: 12px;
+      margin-top: 14px;
+    }
+
+    .previewBox img {
+      width: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: none;
+    }
+
+    .previewNote {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .formGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        width: min(100% - 20px, 1180px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div>My Photo Gallery</div>
+          <div style="color: var(--muted); font-weight: 500; font-size: 0.9rem;">Upload</div>
+        </div>
+      </div>
+
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="home.html">Home</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="albums.html">Albums</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="upload.html" style="color: var(--text); background: rgba(255,255,255,0.08);">Upload</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <article class="card">
+        <h1>Upload with metadata</h1>
+        <p class="muted" style="margin-top:10px;">
+          Add a photo from your device or save an image by URL. This version also sends metadata like tags,
+          camera details, location, favorite, visibility, and date taken.
+        </p>
+
+        <div class="pillRow">
+          <div class="pill">Device upload</div>
+          <div class="pill">Image URL</div>
+          <div class="pill">Metadata ready</div>
+          <div class="pill">Backend connected</div>
+        </div>
+      </article>
+
+      <aside class="card">
+        <h2 class="sectionTitle">What this page now sends</h2>
+        <div class="sideList">
+          <div class="infoItem">
+            <strong>Basic details</strong>
+            <span class="help">Title, category, description, and tags.</span>
+          </div>
+          <div class="infoItem">
+            <strong>Camera details</strong>
+            <span class="help">Camera make, model, lens, ISO, shutter speed, aperture, and focal length.</span>
+          </div>
+          <div class="infoItem">
+            <strong>Extra metadata</strong>
+            <span class="help">Taken date, location, favorite, visibility, and optional width/height.</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <main class="grid">
+      <section class="card">
+        <h2 class="sectionTitle">Add your photo</h2>
+
+        <div class="modeTabs">
+          <button class="modeBtn active" type="button" data-mode="file" id="fileModeBtn">Upload from device</button>
+          <button class="modeBtn" type="button" data-mode="url" id="urlModeBtn">Save by image URL</button>
+        </div>
+
+        <form id="uploadForm">
+          <div class="formGrid">
+            <div class="field full">
+              <label for="title">Photo Title</label>
+              <input id="title" type="text" placeholder="Enter a photo title" required />
+            </div>
+
+            <div class="field">
+              <label for="category">Category</label>
+              <select id="category" required>
+                <option value="">Select category</option>
+                <option value="travel">Travel</option>
+                <option value="nature">Nature</option>
+                <option value="family">Family</option>
+                <option value="friends">Friends</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="tags">Tags</label>
+              <input id="tags" type="text" placeholder="sunset, trip, nepal" />
+            </div>
+
+            <div class="field full">
+              <label for="description">Description</label>
+              <textarea id="description" placeholder="Write a short description"></textarea>
+            </div>
+
+            <div class="field full" id="fileUploadField">
+              <label>Upload Photo File</label>
+              <div class="dropzone" id="dropzone">
+                <div style="font-weight:800;">Drag & drop a photo here</div>
+                <div class="help" style="margin-top:6px;">Or choose a file manually</div>
+                <input id="photoInput" type="file" accept="image/*" />
+              </div>
+            </div>
+
+            <div class="field full" id="urlUploadField" style="display:none;">
+              <label for="imageUrl">Image URL</label>
+              <input id="imageUrl" type="url" placeholder="https://example.com/photo.jpg" />
+            </div>
+
+            <div class="field">
+              <label for="takenAt">Taken At</label>
+              <input id="takenAt" type="datetime-local" />
+            </div>
+
+            <div class="field">
+              <label for="visibility">Visibility</label>
+              <select id="visibility">
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+                <option value="shared">Shared</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="cameraMake">Camera Make</label>
+              <input id="cameraMake" type="text" placeholder="Canon" />
+            </div>
+
+            <div class="field">
+              <label for="cameraModel">Camera Model</label>
+              <input id="cameraModel" type="text" placeholder="EOS R50" />
+            </div>
+
+            <div class="field">
+              <label for="lensModel">Lens Model</label>
+              <input id="lensModel" type="text" placeholder="18-45mm" />
+            </div>
+
+            <div class="field">
+              <label for="iso">ISO</label>
+              <input id="iso" type="number" placeholder="200" />
+            </div>
+
+            <div class="field">
+              <label for="shutterSpeed">Shutter Speed</label>
+              <input id="shutterSpeed" type="text" placeholder="1/250" />
+            </div>
+
+            <div class="field">
+              <label for="aperture">Aperture</label>
+              <input id="aperture" type="text" placeholder="f/5.6" />
+            </div>
+
+            <div class="field">
+              <label for="focalLength">Focal Length</label>
+              <input id="focalLength" type="text" placeholder="35mm" />
+            </div>
+
+            <div class="field">
+              <label for="width">Width</label>
+              <input id="width" type="number" placeholder="1920" />
+            </div>
+
+            <div class="field">
+              <label for="height">Height</label>
+              <input id="height" type="number" placeholder="1080" />
+            </div>
+
+            <div class="field full">
+              <label for="locationName">Location Name</label>
+              <input id="locationName" type="text" placeholder="Pokhara Lakeside" />
+            </div>
+
+            <div class="field">
+              <label for="latitude">Latitude</label>
+              <input id="latitude" type="number" step="any" placeholder="28.2096" />
+            </div>
+
+            <div class="field">
+              <label for="longitude">Longitude</label>
+              <input id="longitude" type="number" step="any" placeholder="83.9856" />
+            </div>
+
+            <div class="field full">
+              <label class="inlineCheck">
+                <input id="isFavorite" type="checkbox" />
+                <span>Mark as favorite</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit" id="saveBtn">Save Photo</button>
+            <button class="btn" type="reset" id="resetBtn">Clear Form</button>
+            <a class="btn" href="gallery.html">Go to Gallery</a>
+          </div>
+
+          <div class="message" id="messageBox"></div>
+        </form>
+      </section>
+
+      <aside class="card">
+        <h2 class="sectionTitle">Preview & tips</h2>
+
+        <div class="previewBox">
+          <img id="previewImage" alt="Photo preview" />
+          <div class="previewNote" id="previewNote">
+            Choose a file or paste an image URL to preview it here.
+          </div>
+        </div>
+
+        <div class="sideList" style="margin-top:16px;">
+          <div class="infoItem">
+            <strong>For file upload</strong>
+            <span class="help">This sends a multipart form with your file plus all metadata fields.</span>
+          </div>
+          <div class="infoItem">
+            <strong>For URL upload</strong>
+            <span class="help">This sends JSON to your backend with image URL plus metadata fields.</span>
+          </div>
+          <div class="infoItem">
+            <strong>After save</strong>
+            <span class="help">You’ll be redirected to the gallery page so you can confirm the photo is stored.</span>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      © 2026 • My Photo Gallery Project • Upload with metadata
+    </footer>
+  </div>
+
+  <script>
+    const uploadForm = document.getElementById("uploadForm");
+    const fileModeBtn = document.getElementById("fileModeBtn");
+    const urlModeBtn = document.getElementById("urlModeBtn");
+    const fileUploadField = document.getElementById("fileUploadField");
+    const urlUploadField = document.getElementById("urlUploadField");
+    const photoInput = document.getElementById("photoInput");
+    const imageUrlInput = document.getElementById("imageUrl");
+    const dropzone = document.getElementById("dropzone");
+    const previewImage = document.getElementById("previewImage");
+    const previewNote = document.getElementById("previewNote");
+    const messageBox = document.getElementById("messageBox");
+    const resetBtn = document.getElementById("resetBtn");
+    const saveBtn = document.getElementById("saveBtn");
+    const widthInput = document.getElementById("width");
+    const heightInput = document.getElementById("height");
+
+    let mode = "file";
+
+    function showMessage(message, type = "success") {
+      messageBox.textContent = message;
+      messageBox.className = `message show ${type}`;
+    }
+
+    function hideMessage() {
+      messageBox.textContent = "";
+      messageBox.className = "message";
+    }
+
+    function setSaving(isSaving) {
+      saveBtn.disabled = isSaving;
+      saveBtn.textContent = isSaving ? "Saving..." : "Save Photo";
+    }
+
+    function normalizeCategory(value) {
+      const v = String(value || "").trim().toLowerCase();
+
+      const categoryMap = {
+        travel: "travel",
+        trip: "travel",
+        vacation: "travel",
+        family: "family",
+        friend: "friends",
+        friends: "friends",
+        nature: "nature",
+        forest: "nature",
+        beach: "nature",
+        sunset: "nature",
+        other: "other",
+        uncategorized: "other"
+      };
+
+      return categoryMap[v] || "other";
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+
+      const isFile = mode === "file";
+
+      fileModeBtn.classList.toggle("active", isFile);
+      urlModeBtn.classList.toggle("active", !isFile);
+
+      fileUploadField.style.display = isFile ? "block" : "none";
+      urlUploadField.style.display = isFile ? "none" : "block";
+
+      if (isFile) {
+        imageUrlInput.value = "";
+      } else {
+        photoInput.value = "";
+      }
+
+      updatePreview();
+      hideMessage();
+    }
+
+    function setDimensions(width, height) {
+      if (width && height) {
+        widthInput.value = width;
+        heightInput.value = height;
+      }
+    }
+
+    function clearDimensions() {
+      widthInput.value = "";
+      heightInput.value = "";
+    }
+
+    function loadImageDimensions(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve({
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
+        img.onerror = () => reject(new Error("Could not read image dimensions"));
+        img.src = src;
+      });
+    }
+
+    async function updateDimensionsFromFile(file) {
+      if (!file) {
+        clearDimensions();
+        return;
+      }
+
+      try {
+        const fileUrl = URL.createObjectURL(file);
+        const dimensions = await loadImageDimensions(fileUrl);
+        setDimensions(dimensions.width, dimensions.height);
+        URL.revokeObjectURL(fileUrl);
+      } catch {
+        clearDimensions();
+      }
+    }
+
+    async function updateDimensionsFromUrl(url) {
+      if (!url) {
+        clearDimensions();
+        return;
+      }
+
+      try {
+        const dimensions = await loadImageDimensions(url);
+        setDimensions(dimensions.width, dimensions.height);
+      } catch {
+        clearDimensions();
+      }
+    }
+
+    async function updatePreview() {
+      const file = photoInput.files && photoInput.files[0];
+      const imageUrl = imageUrlInput.value.trim();
+
+      if (mode === "file" && file) {
+        const fileUrl = URL.createObjectURL(file);
+        previewImage.src = fileUrl;
+        previewImage.style.display = "block";
+        previewNote.textContent = `Selected file: ${file.name}`;
+        await updateDimensionsFromFile(file);
+        return;
+      }
+
+      if (mode === "url" && imageUrl) {
+        previewImage.src = imageUrl;
+        previewImage.style.display = "block";
+        previewNote.textContent = "Preview from image URL";
+        await updateDimensionsFromUrl(imageUrl);
+        return;
+      }
+
+      previewImage.removeAttribute("src");
+      previewImage.style.display = "none";
+      previewNote.textContent = "Choose a file or paste an image URL to preview it here.";
+      clearDimensions();
+    }
+
+    function buildCommonMetadata() {
+      return {
+        title: document.getElementById("title").value.trim(),
+        category: normalizeCategory(document.getElementById("category").value.trim()),
+        description: document.getElementById("description").value.trim(),
+        tags: document.getElementById("tags").value.trim(),
+        takenAt: document.getElementById("takenAt").value,
+        cameraMake: document.getElementById("cameraMake").value.trim(),
+        cameraModel: document.getElementById("cameraModel").value.trim(),
+        lensModel: document.getElementById("lensModel").value.trim(),
+        iso: document.getElementById("iso").value,
+        shutterSpeed: document.getElementById("shutterSpeed").value.trim(),
+        aperture: document.getElementById("aperture").value.trim(),
+        focalLength: document.getElementById("focalLength").value.trim(),
+        width: document.getElementById("width").value,
+        height: document.getElementById("height").value,
+        locationName: document.getElementById("locationName").value.trim(),
+        latitude: document.getElementById("latitude").value,
+        longitude: document.getElementById("longitude").value,
+        isFavorite: document.getElementById("isFavorite").checked,
+        visibility: document.getElementById("visibility").value
+      };
+    }
+
+    async function readErrorMessage(response) {
+      let result = {};
+      try {
+        result = await response.json();
+      } catch {
+        result = {};
+      }
+
+      if (result && result.error) return result.error;
+      if (result && result.message) return result.message;
+      return `Request failed with status ${response.status}`;
+    }
+
+    fileModeBtn.addEventListener("click", () => setMode("file"));
+    urlModeBtn.addEventListener("click", () => setMode("url"));
+
+    photoInput.addEventListener("change", updatePreview);
+    imageUrlInput.addEventListener("input", updatePreview);
+
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) {
+        photoInput.files = e.dataTransfer.files;
+        await updatePreview();
+      }
+    });
+
+    previewImage.addEventListener("error", () => {
+      previewImage.style.display = "none";
+      previewNote.textContent = "Could not preview that image.";
+    });
+
+    uploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideMessage();
+
+      const metadata = buildCommonMetadata();
+
+      if (!metadata.title) {
+        showMessage("Please enter a photo title.", "error");
+        return;
+      }
+
+      if (!document.getElementById("category").value.trim()) {
+        showMessage("Please select a category.", "error");
+        return;
+      }
+
+      try {
+        setSaving(true);
+
+        if (mode === "file") {
+          const file = photoInput.files[0];
+
+          if (!file) {
+            showMessage("Please choose or drag a photo file.", "error");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("title", metadata.title);
+          formData.append("photo", file);
+          formData.append("category", metadata.category);
+          formData.append("description", metadata.description);
+          formData.append("tags", metadata.tags);
+          formData.append("takenAt", metadata.takenAt);
+          formData.append("cameraMake", metadata.cameraMake);
+          formData.append("cameraModel", metadata.cameraModel);
+          formData.append("lensModel", metadata.lensModel);
+          formData.append("iso", metadata.iso);
+          formData.append("shutterSpeed", metadata.shutterSpeed);
+          formData.append("aperture", metadata.aperture);
+          formData.append("focalLength", metadata.focalLength);
+          formData.append("width", metadata.width);
+          formData.append("height", metadata.height);
+          formData.append("locationName", metadata.locationName);
+          formData.append("latitude", metadata.latitude);
+          formData.append("longitude", metadata.longitude);
+          formData.append("isFavorite", metadata.isFavorite ? "1" : "0");
+          formData.append("visibility", metadata.visibility);
+
+          const response = await fetch("/api/photos/upload", {
+            method: "POST",
+            body: formData
+          });
+
+          if (!response.ok) {
+            const errorMessage = await readErrorMessage(response);
+            showMessage(errorMessage, "error");
+            return;
+          }
+
+          showMessage("Photo uploaded successfully.");
+          window.location.href = "/gallery.html?uploaded=1";
+        } else {
+          const imageUrl = imageUrlInput.value.trim();
+
+          if (!imageUrl) {
+            showMessage("Please enter an image URL.", "error");
+            return;
+          }
+
+          const response = await fetch("/api/photos", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              title: metadata.title,
+              imageUrl,
+              category: metadata.category,
+              description: metadata.description,
+              tags: metadata.tags,
+              takenAt: metadata.takenAt,
+              cameraMake: metadata.cameraMake,
+              cameraModel: metadata.cameraModel,
+              lensModel: metadata.lensModel,
+              iso: metadata.iso,
+              shutterSpeed: metadata.shutterSpeed,
+              aperture: metadata.aperture,
+              focalLength: metadata.focalLength,
+              width: metadata.width,
+              height: metadata.height,
+              locationName: metadata.locationName,
+              latitude: metadata.latitude,
+              longitude: metadata.longitude,
+              isFavorite: metadata.isFavorite,
+              visibility: metadata.visibility
+            })
+          });
+
+          if (!response.ok) {
+            const errorMessage = await readErrorMessage(response);
+            showMessage(errorMessage, "error");
+            return;
+          }
+
+          showMessage("Photo saved successfully.");
+          window.location.href = "/gallery.html?uploaded=1";
+        }
+      } catch (error) {
+        showMessage(`Something went wrong while saving the photo.\n${error.message || ""}`, "error");
+      } finally {
+        setSaving(false);
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      hideMessage();
+      setTimeout(() => {
+        clearDimensions();
+        updatePreview();
+      }, 0);
+    });
+  </script>
+
+  <script src="theme.js"></script>
+</body>
+</html> 

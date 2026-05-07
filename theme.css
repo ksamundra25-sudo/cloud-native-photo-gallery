@@ -1,0 +1,68 @@
+/* ========= THEME VARIABLES (DEFAULT = DARK) ========= */
+:root{
+  --bg: #0b1220;
+  --text: #eaf0ff;
+  --muted: rgba(234,240,255,0.72);
+
+  --line: rgba(255,255,255,0.14);
+  --shadow: 0 12px 30px rgba(0,0,0,0.35);
+  --radius: 18px;
+
+  /* Cards / glass surfaces */
+  --card: rgba(255,255,255,0.07);
+  --card2: rgba(255,255,255,0.10);
+
+  /* ✅ Customizable accent colors (used by buttons + gradients) */
+  --accent: #00d4ff;
+  --accent2: #6a5cff;
+}
+
+/* ========= LIGHT THEME OVERRIDES ========= */
+html[data-theme="light"]{
+  --bg: #f6f8ff;
+  --text: #0b1220;
+  --muted: rgba(11,18,32,0.72);
+
+  --line: rgba(11,18,32,0.14);
+  --shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+  --card: rgba(0,0,0,0.04);
+  --card2: rgba(0,0,0,0.06);
+}
+
+/* ========= GLOBAL BASE (helps every page) ========= */
+body{
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* If your pages use these classes, this makes them match the theme */
+.nav,
+.card,
+.heroCard,
+.sideCard{
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+/* ========= BUTTONS ========= */
+.btn{
+  border: 1px solid var(--line);
+}
+
+/* Primary buttons use accent colors (customizable) */
+.btn.primary{
+  background: linear-gradient(135deg, var(--accent2), var(--accent)) !important;
+  border: none !important;
+  color: #06101a !important;
+}
+
+/* Optional: active nav link glow */
+.navlinks a.active{
+  background: var(--card2);
+}
+
+/* Optional: inputs */
+input, select, textarea{
+  border: 1px solid var(--line);
+}

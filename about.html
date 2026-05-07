@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About • My Photo Gallery</title>
+
+  <style>
+    :root{
+      --bg: #070b16;
+      --text: #eaf0ff;
+      --muted: rgba(234,240,255,0.72);
+      --line: rgba(255,255,255,0.14);
+      --shadow: 0 18px 60px rgba(0,0,0,0.55);
+      --radius: 18px;
+      --glass: rgba(255,255,255,0.07);
+      --glass2: rgba(255,255,255,0.10);
+    }
+
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a{ color: inherit; text-decoration:none; }
+
+    /* Animated VFX background */
+    .bg{
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(900px 600px at 12% 12%, rgba(106,92,255,0.30), transparent 58%),
+        radial-gradient(900px 600px at 88% 18%, rgba(0,212,255,0.20), transparent 60%),
+        radial-gradient(900px 600px at 40% 92%, rgba(255,61,245,0.18), transparent 60%),
+        radial-gradient(700px 400px at 70% 70%, rgba(255,255,255,0.06), transparent 62%),
+        linear-gradient(180deg, #060912, #070b16 40%, #050816);
+      filter: saturate(1.05);
+    }
+
+    .noise{
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.10;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .orb{
+      position: fixed;
+      width: 380px;
+      height: 380px;
+      border-radius: 999px;
+      background: conic-gradient(from 220deg, rgba(106,92,255,0.75), rgba(0,212,255,0.55), rgba(255,61,245,0.50), rgba(106,92,255,0.75));
+      filter: blur(40px);
+      opacity: 0.20;
+      z-index: -1;
+      animation: floaty 10s ease-in-out infinite;
+    }
+    .orb.one{ left: -90px; top: 90px; animation-duration: 12s; }
+    .orb.two{ right: -110px; top: 240px; animation-duration: 14s; }
+    .orb.three{ left: 35%; bottom: -160px; animation-duration: 16s; }
+
+    @keyframes floaty{
+      0%,100%{ transform: translate(0,0) scale(1); }
+      50%{ transform: translate(18px,-22px) scale(1.02); }
+    }
+
+    .container{
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+      padding: 22px 0 60px;
+    }
+
+    /* Navbar (same family as your other pages) */
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 12px;
+      z-index: 50;
+    }
+    .brand{
+      display:flex; align-items:center; gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .logo{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      background: conic-gradient(from 210deg, #6a5cff, #00d4ff, #ff3df5, #6a5cff);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+    }
+    .navlinks{
+      display:flex; align-items:center; gap: 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .navlinks a{
+      padding: 8px 10px;
+      border-radius: 12px;
+    }
+    .navlinks a:hover{ background: rgba(255,255,255,0.08); color: var(--text); }
+    .navlinks a.active{ background: rgba(255,255,255,0.08); color: var(--text); }
+
+    .btn{
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+      font-weight: 600;
+      display:inline-block;
+      white-space: nowrap;
+    }
+    .btn:hover{ background: rgba(255,255,255,0.10); transform: translateY(-1px); }
+    .btn.primary{
+      border: none;
+      background: linear-gradient(135deg, #6a5cff, #00d4ff);
+      color: #06101a;
+    }
+
+    /* Hero */
+    .hero{
+      margin-top: 26px;
+      display:grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    @media (max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border: 1px solid var(--line);
+      background: var(--glass);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shine{
+      position:absolute;
+      inset: -200px;
+      background: radial-gradient(closest-side, rgba(255,255,255,0.12), transparent 60%);
+      transform: translate(30%, -20%);
+      pointer-events:none;
+    }
+
+    .kicker{
+      display:inline-flex;
+      gap: 8px;
+      align-items:center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 0.9rem;
+      width: fit-content;
+    }
+    .dot{
+      width: 9px; height: 9px; border-radius: 99px;
+      background: #00d4ff;
+      box-shadow: 0 0 0 6px rgba(0,212,255,0.12);
+    }
+
+    h1{
+      margin-top: 14px;
+      font-size: clamp(2.0rem, 3.2vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -0.6px;
+    }
+    .subtitle{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      max-width: 70ch;
+    }
+
+    .pillRow{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill{
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: rgba(234,240,255,0.85);
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .profile{
+      display:flex;
+      gap: 14px;
+      align-items:center;
+    }
+    .avatar{
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background:
+        radial-gradient(20px 20px at 30% 35%, rgba(255,255,255,0.55), transparent 60%),
+        linear-gradient(135deg, rgba(106,92,255,0.75), rgba(0,212,255,0.55), rgba(255,61,245,0.45));
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.35);
+      flex: 0 0 auto;
+    }
+    .profile strong{ font-size: 1.05rem; display:block; }
+    .profile span{ color: var(--muted); display:block; margin-top: 2px; font-size: 0.93rem; }
+
+    .quick{
+      margin-top: 14px;
+      display:grid;
+      gap: 10px;
+    }
+    .quick a{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: rgba(234,240,255,0.90);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .quick a:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.22);
+    }
+    .arrow{ color: rgba(234,240,255,0.70); font-weight: 800; }
+
+    /* Two sections */
+    .sections{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 900px){
+      .sections{ grid-template-columns: 1fr; }
+    }
+
+    h2{
+      font-size: 1.2rem;
+      letter-spacing: -0.2px;
+    }
+    .text{
+      margin-top: 10px;
+      color: rgba(234,240,255,0.82);
+      line-height: 1.75;
+      font-size: 1rem;
+    }
+
+    .list{
+      margin-top: 12px;
+      display:grid;
+      gap: 10px;
+    }
+    .item{
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+    }
+    .item strong{ display:block; }
+    .item span{ display:block; margin-top: 3px; color: var(--muted); font-size: 0.95rem; }
+
+    footer{
+      margin-top: 26px;
+      color: var(--muted);
+      text-align:center;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div class="noise"></div>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+  <div class="orb three"></div>
+
+  <div class="container">
+
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div>My Photo Gallery</div>
+          <div style="color: var(--muted); font-weight: 500; font-size: 0.9rem;">About</div>
+        </div>
+      </div>
+
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="home.html">Home</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="albums.html">Albums</a>
+        <a class="active" href="about.html">About</a>
+		<a href="contact.html">Contact</a>
+		<a href="features.html">Features</a>
+		
+      </nav>
+
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a class="btn" href="home.html">Back Home</a>
+        <a class="btn primary" href="gallery.html">Open Gallery</a>
+		<button class="btn" id="themeToggle" type="button">Light mode</button>
+		<button class="btn" id="customizeBtn" type="button">Customize</button>
+      </div>
+    </header>
+
+    <main class="hero">
+      <section class="card">
+        <div class="shine" aria-hidden="true"></div>
+        <div class="kicker"><span class="dot"></span> About This Project</div>
+        <h1>About Me & My Photo Website</h1>
+        <p class="subtitle">
+          This website is a coursework project inspired by modern photo gallery apps. It focuses on a clean UI,
+          quick navigation, and a simple way to organize images into albums.
+        </p>
+
+        <div class="pillRow">
+          <div class="pill">Modern UI</div>
+          <div class="pill">Responsive Layout</div>
+          <div class="pill">Albums + Filters</div>
+          <div class="pill">Lightbox Viewer</div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="profile">
+          <div class="avatar" aria-hidden="true"></div>
+          <div>
+            <strong>Samundra Khanal</strong>
+            <span>Computing • BSc Student (UK)</span>
+          </div>
+        </div>
+
+        <div class="quick" style="margin-top: 14px;">
+          <a href="home.html"><span>Go to Home</span> <span class="arrow">→</span></a>
+          <a href="gallery.html"><span>Browse Gallery</span> <span class="arrow">→</span></a>
+          <a href="albums.html"><span>View Albums</span> <span class="arrow">→</span></a>
+        </div>
+
+        <div class="list">
+          <div class="item">
+            <strong>Project goal</strong>
+            <span>Organize and view photos in a simple, professional-looking web layout.</span>
+          </div>
+          <div class="item">
+            <strong>Design style</strong>
+            <span>Glass UI + gradient VFX background, similar to modern apps.</span>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="sections">
+      <article class="card">
+        <h2>About Me</h2>
+        <p class="text">
+          My name is <b>Samundra Khanal</b>. I was born in <b>Nepal</b>, and I am currently living in the <b>UK</b>
+          while studying for my <b>BSc degree in Computing</b>. I enjoy learning how websites and applications are built,
+          especially how design and functionality work together. I’m interested in topics like web development, user
+          interface design, and building projects that feel modern, simple, and easy to use.
+        </p>
+        <p class="text">
+          This project helps me practice real skills like structuring pages with HTML, styling with CSS, and adding
+          interactive features using JavaScript. My aim is to keep improving step-by-step and create work that looks
+          professional and is easy for users to understand.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>About This Website</h2>
+        <p class="text">
+          <b>My Photo Gallery</b> is a mini photo-management website inspired by apps like online galleries. It includes
+          a welcome homepage, a photo gallery page with search and a lightbox viewer, and an albums page that links to
+          filtered views. The design uses a responsive layout so it works on mobile and desktop.
+        </p>
+
+        <div class="list">
+          <div class="item">
+            <strong>Home</strong>
+            <span>Welcome message, description, and quick navigation.</span>
+          </div>
+          <div class="item">
+            <strong>Gallery</strong>
+            <span>Grid layout, search, filters, and fullscreen image viewer.</span>
+          </div>
+          <div class="item">
+            <strong>Albums</strong>
+            <span>Album cards that open Gallery with a selected category.</span>
+          </div>
+          <div class="item">
+            <strong>About</strong>
+            <span>Project details + information about me (student profile).</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn" href="albums.html">See Albums</a>
+          <a class="btn primary" href="gallery.html">View Photos</a>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      © 2026 • My Photo Gallery Project • Student work (inspired by modern gallery apps)
+    </footer>
+
+  </div>
+</body>
+</html>

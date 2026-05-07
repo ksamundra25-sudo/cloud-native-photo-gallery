@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery • My Photo Gallery</title>
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    :root {
+      --bg1: #0b1020;
+      --bg2: #121a31;
+      --card: rgba(255,255,255,0.08);
+      --line: rgba(255,255,255,0.14);
+      --text: #f5f7ff;
+      --muted: #b9c3e6;
+      --accent: #00d4ff;
+      --accent2: #6a5cff;
+      --danger: #ff5a7a;
+      --ok: #37d67a;
+      --radius: 20px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0,212,255,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(106,92,255,0.16), transparent 22%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: var(--shadow);
+    }
+
+    .navlinks,
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .navlinks a,
+    .btn,
+    button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: 0.2s ease;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .navlinks a:hover,
+    .btn:hover,
+    button:hover {
+      transform: translateY(-1px);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+    }
+
+    .btn.success {
+      background: rgba(55,214,122,0.12);
+      border-color: rgba(55,214,122,0.28);
+      color: #d8ffe9;
+    }
+
+    .btn.danger {
+      background: rgba(255,90,122,0.12);
+      border-color: rgba(255,90,122,0.28);
+      color: #ffd7df;
+    }
+
+    .btn:disabled,
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .top {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .topRow {
+      display: flex;
+      gap: 18px;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.9rem);
+      letter-spacing: -1px;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .topTools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      width: 100%;
+    }
+
+    .searchWrap {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .searchWrap input,
+    .searchWrap select {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      color: var(--text);
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .albumsBar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .albumCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .albumCard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .albumCover {
+      width: 100%;
+      height: 136px;
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .albumPlaceholder {
+      width: 100%;
+      height: 136px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .albumMeta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .albumMeta strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .albumMeta span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .albumPill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 11px;
+      color: rgba(234,240,255,0.9);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .statsRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      padding: 10px 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .statusBox {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+      display: none;
+      white-space: pre-line;
+    }
+
+    .statusBox.show {
+      display: block;
+    }
+
+    .grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .photoCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .photoCard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .photoCard img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .photoBody {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .titleRow {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .titleRow strong {
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .badgeRow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: rgba(234,240,255,0.9);
+    }
+
+    .badge.favorite {
+      color: #ffe7a7;
+      border-color: rgba(255,231,167,0.25);
+      background: rgba(255,231,167,0.08);
+    }
+
+    .badge.public {
+      color: #c9ffe4;
+      border-color: rgba(55,214,122,0.28);
+      background: rgba(55,214,122,0.08);
+    }
+
+    .badge.private {
+      color: #e4d8ff;
+      border-color: rgba(166,125,255,0.28);
+      background: rgba(166,125,255,0.08);
+    }
+
+    .badge.shared {
+      color: #d6f7ff;
+      border-color: rgba(0,212,255,0.28);
+      background: rgba(0,212,255,0.08);
+    }
+
+    .photoDesc {
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .miniMeta {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+
+    .empty {
+      margin-top: 18px;
+      border: 1px dashed rgba(255,255,255,0.22);
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      display: none;
+    }
+
+    .lightbox,
+    .editOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 200;
+    }
+
+    .lightbox.open,
+    .editOverlay.open {
+      display: flex;
+    }
+
+    .viewer,
+    .editModal {
+      width: min(1040px, 96vw);
+      max-height: 92vh;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(15,18,28,0.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 22px 60px rgba(0,0,0,0.5);
+    }
+
+    .viewer {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .viewerTop,
+    .editTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .viewerTop .title,
+    .editTop .title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .viewerTop .title strong,
+    .editTop .title strong {
+      font-size: 1rem;
+    }
+
+    .viewerTop .title span,
+    .editTop .title span {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .viewerTop .close,
+    .editTop .close {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .viewerBody {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      min-height: 0;
+    }
+
+    .viewerImageWrap {
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+    }
+
+    .viewerImg {
+      width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      display: block;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .viewerSide {
+      border-left: 1px solid rgba(255,255,255,0.14);
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .viewerSection {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .viewerSection h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .viewerText {
+      color: var(--muted);
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .metaGrid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .metaItem {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+
+    .metaItem strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .metaItem span {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .viewerBottom,
+    .editBottom {
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.14);
+      color: var(--muted);
+      font-size: 0.92rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .photoMeta {
+      line-height: 1.7;
+      word-break: break-word;
+      flex: 1 1 300px;
+    }
+
+    .viewerActions,
+    .editActions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .editModal {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .editBody {
+      padding: 16px;
+      overflow: auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .editGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .formGroup {
+      display: grid;
+      gap: 8px;
+    }
+
+    .formGroup.full {
+      grid-column: 1 / -1;
+    }
+
+    .formGroup label {
+      font-weight: 800;
+      color: rgba(255,255,255,0.92);
+      font-size: 0.92rem;
+    }
+
+    .checkboxRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .checkboxRow input {
+      width: auto;
+      margin: 0;
+    }
+
+    .customizePanel {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: min(360px, 92vw);
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: none;
+      z-index: 999;
+    }
+
+    .customizePanel.open { display: block; }
+
+    .customizeRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .customizeRow input[type="color"] {
+      width: 54px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: transparent;
+      padding: 0;
+    }
+
+    .customizeActions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 920px) {
+      .viewerBody {
+        grid-template-columns: 1fr;
+      }
+
+      .viewerSide {
+        border-left: none;
+        border-top: 1px solid rgba(255,255,255,0.14);
+      }
+
+      .editGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .container {
+        width: min(100% - 20px, 1220px);
+      }
+
+      .topRow {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div>My Photo Gallery</div>
+          <div style="color: var(--muted); font-weight: 500; font-size: 0.9rem;">Gallery</div>
+        </div>
+      </div>
+
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="home.html">Home</a>
+        <a href="gallery.html" style="color: var(--text); background: rgba(255,255,255,0.08);">Gallery</a>
+        <a href="albums.html">Albums</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="actions">
+        <a class="btn primary" href="upload.html">Upload</a>
+        <button class="btn" id="themeToggle" type="button">Light mode</button>
+        <button class="btn" id="customizeBtn" type="button">Customize</button>
+        <button class="btn primary" id="randomBtn" type="button">Random Color</button>
+      </div>
+    </header>
+
+    <section class="top">
+      <div class="card">
+        <div class="topRow">
+          <div>
+            <h1>Your Photos</h1>
+            <p class="muted" style="margin-top: 8px;">
+              Browse your saved photos, search across metadata, open them in a detailed viewer,
+              and manage items directly from the gallery.
+            </p>
+          </div>
+          <div class="stat" id="countText">0 photos</div>
+        </div>
+
+        <div class="topTools">
+          <div class="searchWrap">
+            <input id="searchInput" type="text" placeholder="Search title, description, tags, camera, location..." />
+            <select id="sortSelect">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="title_asc">Title A–Z</option>
+              <option value="title_desc">Title Z–A</option>
+            </select>
+            <button class="btn" id="clearBtn" type="button">Clear</button>
+          </div>
+        </div>
+
+        <div class="chips">
+          <button class="chip active" data-tag="all" type="button">All</button>
+          <button class="chip" data-tag="travel" type="button">Travel</button>
+          <button class="chip" data-tag="family" type="button">Family</button>
+          <button class="chip" data-tag="friends" type="button">Friends</button>
+          <button class="chip" data-tag="nature" type="button">Nature</button>
+          <button class="chip" data-tag="other" type="button">Other</button>
+          <button class="chip" data-tag="favorites" type="button">Favorites</button>
+          <button class="chip" data-tag="public" type="button">Public</button>
+        </div>
+
+        <div class="statsRow">
+          <div class="stat" id="favoriteCount">Favorites: 0</div>
+          <div class="stat" id="publicCount">Public: 0</div>
+          <div class="stat" id="uploadCount">Uploads: 0</div>
+        </div>
+
+        <div class="statusBox" id="statusBox"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom: 12px;">
+          <h2 style="margin:0; font-size:1.2rem;">Albums</h2>
+          <div class="muted" style="font-size:0.94rem;">Quick category view</div>
+        </div>
+        <div class="albumsBar" id="albumsBar"></div>
+      </div>
+    </section>
+
+    <section class="grid" id="galleryGrid"></section>
+
+    <div class="empty" id="emptyState">
+      No photos match your current search or filter.
+    </div>
+
+    <footer>
+      © 2026 • My Photo Gallery Project • Gallery with metadata
+    </footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="viewer">
+      <div class="viewerTop">
+        <div class="title">
+          <strong id="viewTitle">Photo title</strong>
+          <span id="viewTag">Category</span>
+        </div>
+        <button class="close" id="closeLightbox" type="button">Close</button>
+      </div>
+
+      <div class="viewerBody">
+        <div class="viewerImageWrap">
+          <img class="viewerImg" id="viewImg" alt="Selected photo" />
+        </div>
+
+        <div class="viewerSide">
+          <div class="viewerSection">
+            <h3>Description</h3>
+            <div class="viewerText" id="viewDesc">No description available.</div>
+          </div>
+
+          <div class="viewerSection">
+            <h3>Badges</h3>
+            <div class="badgeRow" id="viewerBadges"></div>
+          </div>
+
+          <div class="viewerSection">
+            <h3>Metadata</h3>
+            <div class="metaGrid" id="viewerMetaGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="viewerBottom">
+        <div class="photoMeta" id="photoMeta"></div>
+        <div class="viewerActions">
+          <a class="btn" id="openOriginalBtn" href="#" target="_blank" rel="noopener noreferrer">Open Image</a>
+          <button class="btn" id="editBtn" type="button">Edit Photo</button>
+          <button class="btn danger" id="deleteBtn" type="button">Delete Photo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="editOverlay" id="editOverlay" aria-hidden="true">
+    <div class="editModal">
+      <div class="editTop">
+        <div class="title">
+          <strong>Edit Photo</strong>
+          <span>Update title, description, category, tags and visibility</span>
+        </div>
+        <button class="close" id="closeEditModal" type="button">Close</button>
+      </div>
+
+      <div class="editBody">
+        <div class="editGrid">
+          <div class="formGroup">
+            <label for="editTitle">Title</label>
+            <input id="editTitle" type="text" placeholder="Photo title" />
+          </div>
+
+          <div class="formGroup">
+            <label for="editCategory">Category</label>
+            <select id="editCategory">
+              <option value="travel">Travel</option>
+              <option value="family">Family</option>
+              <option value="friends">Friends</option>
+              <option value="nature">Nature</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="formGroup">
+            <label for="editVisibility">Visibility</label>
+            <select id="editVisibility">
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+              <option value="shared">Shared</option>
+            </select>
+          </div>
+
+          <div class="formGroup">
+            <label for="editTags">Tags</label>
+            <input id="editTags" type="text" placeholder="summer, beach, trip" />
+          </div>
+
+          <div class="formGroup full">
+            <label for="editDescription">Description</label>
+            <textarea id="editDescription" placeholder="Write something about this photo..."></textarea>
+          </div>
+
+          <div class="formGroup full">
+            <label>Options</label>
+            <div class="checkboxRow">
+              <input id="editFavorite" type="checkbox" />
+              <label for="editFavorite" style="margin:0;">Mark as favorite</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editBottom">
+        <div class="muted">Changes will be saved to your photo record.</div>
+        <div class="editActions">
+          <button class="btn" id="cancelEditBtn" type="button">Cancel</button>
+          <button class="btn success" id="saveEditBtn" type="button">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="customizePanel" id="customizePanel">
+    <h3 style="margin:0;">Customize</h3>
+    <div style="color:var(--muted); font-size:0.95rem;">Pick accent colors. Saved automatically.</div>
+
+    <div class="customizeRow">
+      <label for="accentPicker" style="font-weight:800;">Accent 1</label>
+      <input id="accentPicker" type="color" value="#00d4ff">
+    </div>
+
+    <div class="customizeRow">
+      <label for="accentPicker2" style="font-weight:800;">Accent 2</label>
+      <input id="accentPicker2" type="color" value="#6a5cff">
+    </div>
+
+    <div class="customizeActions">
+      <button class="btn primary" id="closeCustomize" type="button">Done</button>
+      <button class="btn" id="resetTheme" type="button">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    let photos = [];
+    let activeFilter = "all";
+    let currentPhoto = null;
+
+    const albumsBar = document.getElementById("albumsBar");
+    const grid = document.getElementById("galleryGrid");
+    const emptyState = document.getElementById("emptyState");
+    const countText = document.getElementById("countText");
+    const favoriteCount = document.getElementById("favoriteCount");
+    const publicCount = document.getElementById("publicCount");
+    const uploadCount = document.getElementById("uploadCount");
+    const searchInput = document.getElementById("searchInput");
+    const sortSelect = document.getElementById("sortSelect");
+    const clearBtn = document.getElementById("clearBtn");
+    const chips = Array.from(document.querySelectorAll(".chip"));
+    const statusBox = document.getElementById("statusBox");
+
+    const lightbox = document.getElementById("lightbox");
+    const viewImg = document.getElementById("viewImg");
+    const viewTitle = document.getElementById("viewTitle");
+    const viewTag = document.getElementById("viewTag");
+    const viewDesc = document.getElementById("viewDesc");
+    const photoMeta = document.getElementById("photoMeta");
+    const closeLightbox = document.getElementById("closeLightbox");
+    const deleteBtn = document.getElementById("deleteBtn");
+    const editBtn = document.getElementById("editBtn");
+    const viewerBadges = document.getElementById("viewerBadges");
+    const viewerMetaGrid = document.getElementById("viewerMetaGrid");
+    const openOriginalBtn = document.getElementById("openOriginalBtn");
+
+    const editOverlay = document.getElementById("editOverlay");
+    const closeEditModal = document.getElementById("closeEditModal");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const saveEditBtn = document.getElementById("saveEditBtn");
+    const editTitle = document.getElementById("editTitle");
+    const editCategory = document.getElementById("editCategory");
+    const editVisibility = document.getElementById("editVisibility");
+    const editTags = document.getElementById("editTags");
+    const editDescription = document.getElementById("editDescription");
+    const editFavorite = document.getElementById("editFavorite");
+
+    const customizeBtn = document.getElementById("customizeBtn");
+    const customizePanel = document.getElementById("customizePanel");
+    const closeCustomize = document.getElementById("closeCustomize");
+    const resetTheme = document.getElementById("resetTheme");
+    const accentPicker = document.getElementById("accentPicker");
+    const accentPicker2 = document.getElementById("accentPicker2");
+    const randomBtn = document.getElementById("randomBtn");
+
+    function showStatus(message) {
+      statusBox.textContent = message;
+      statusBox.classList.add("show");
+    }
+
+    function hideStatus() {
+      statusBox.textContent = "";
+      statusBox.classList.remove("show");
+    }
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function safeImageUrl(src) {
+      if (!src) return "";
+      return String(src);
+    }
+
+    async function readJsonSafe(response) {
+      try {
+        return await response.json();
+      } catch {
+        return {};
+      }
+    }
+
+    function mapCategoryToTag(category) {
+      const value = (category || "").trim().toLowerCase();
+
+      switch (value) {
+        case "travel":
+        case "trip":
+        case "vacation":
+          return "travel";
+        case "family":
+          return "family";
+        case "friends":
+        case "friend":
+          return "friends";
+        case "nature":
+        case "forest":
+        case "beach":
+        case "sunset":
+          return "nature";
+        default:
+          return "other";
+      }
+    }
+
+    function prettyTag(tag) {
+      if (!tag) return "Other";
+      if (tag === "all") return "All";
+      return tag.charAt(0).toUpperCase() + tag.slice(1);
+    }
+
+    function inferFileName(src) {
+      if (!src) return "Unknown";
+      return src.split("/").pop().split("?")[0] || "Unknown";
+    }
+
+    function inferFileType(src, mimeType) {
+      if (mimeType) return mimeType;
+      const fileName = inferFileName(src);
+      const ext = fileName.includes(".") ? fileName.split(".").pop().toUpperCase() : "Unknown";
+      return ext || "Unknown";
+    }
+
+    function formatValue(value, fallback = "Unknown") {
+      if (value === null || value === undefined || value === "") return fallback;
+      return String(value);
+    }
+
+    function formatResolution(photo) {
+      if (photo.width && photo.height) return `${photo.width} × ${photo.height}`;
+      return "Unknown";
+    }
+
+    function formatFavorite(value) {
+      return value ? "Yes" : "No";
+    }
+
+    function getPhotoMetaText(photo) {
+      return [
+        `File: ${inferFileName(photo.src)}`,
+        `Resolution: ${formatResolution(photo)}`,
+        `Type: ${inferFileType(photo.src, photo.mimeType)}`,
+        `Source: ${formatValue(photo.sourceType, "Unknown")}`,
+        `Uploaded: ${formatValue(photo.uploadedAt, "Saved in database")}`
+      ].join(" | ");
+    }
+
+    function createBadge(label, className = "") {
+      const el = document.createElement("span");
+      el.className = `badge ${className}`.trim();
+      el.textContent = label;
+      return el;
+    }
+
+    function createMetaItem(label, value) {
+      const div = document.createElement("div");
+      div.className = "metaItem";
+      div.innerHTML = `<strong>${escapeHtml(label)}</strong><span>${escapeHtml(formatValue(value))}</span>`;
+      return div;
+    }
+
+    function normalizePhoto(photo) {
+      return {
+        id: photo.id,
+        src: safeImageUrl(photo.imageUrl),
+        title: photo.title || "Untitled",
+        category: photo.category || "Uncategorized",
+        tag: mapCategoryToTag(photo.category),
+        desc: photo.description || "No description available.",
+        uploadedAt: photo.createdAt || "Saved in database",
+        updatedAt: photo.updatedAt || "",
+        tags: photo.tags || "",
+        filename: photo.filename || "",
+        originalName: photo.originalName || "",
+        mimeType: photo.mimeType || "",
+        sizeBytes: photo.sizeBytes || null,
+        width: photo.width || null,
+        height: photo.height || null,
+        sourceType: photo.sourceType || "",
+        takenAt: photo.takenAt || "",
+        cameraMake: photo.cameraMake || "",
+        cameraModel: photo.cameraModel || "",
+        lensModel: photo.lensModel || "",
+        iso: photo.iso || "",
+        shutterSpeed: photo.shutterSpeed || "",
+        aperture: photo.aperture || "",
+        focalLength: photo.focalLength || "",
+        locationName: photo.locationName || "",
+        latitude: photo.latitude ?? "",
+        longitude: photo.longitude ?? "",
+        isFavorite: Number(photo.isFavorite) === 1 || photo.isFavorite === true,
+        visibility: photo.visibility || "private"
+      };
+    }
+
+    async function fetchPhotos() {
+      try {
+        hideStatus();
+        const sort = sortSelect.value || "newest";
+        const response = await fetch(`/api/photos?sort=${encodeURIComponent(sort)}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch photos");
+        }
+
+        const data = await response.json();
+        photos = Array.isArray(data) ? data.map(normalizePhoto) : [];
+
+        buildAlbums();
+        setFilterFromURL();
+        render();
+        showUploadedMessageIfNeeded();
+      } catch (error) {
+        photos = [];
+        buildAlbums();
+        render();
+        showStatus("Could not load photos from the database.");
+      }
+    }
+
+    function getAlbumCounts() {
+      const counts = {
+        all: photos.length,
+        travel: 0,
+        family: 0,
+        friends: 0,
+        nature: 0,
+        other: 0
+      };
+
+      photos.forEach(photo => {
+        if (counts[photo.tag] !== undefined) {
+          counts[photo.tag]++;
+        } else {
+          counts.other++;
+        }
+      });
+
+      counts.all = photos.length;
+      return counts;
+    }
+
+    function albumCoverSrc(tag) {
+      if (tag === "all") return photos[0]?.src || "";
+      const found = photos.find(photo => photo.tag === tag && photo.src);
+      return found ? found.src : "";
+    }
+
+    function buildAlbums() {
+      const counts = getAlbumCounts();
+
+      const albums = [
+        { tag: "all", label: "All Photos" },
+        { tag: "travel", label: "Travel" },
+        { tag: "family", label: "Family" },
+        { tag: "friends", label: "Best Friends" },
+        { tag: "nature", label: "Nature" },
+        { tag: "other", label: "Other" }
+      ];
+
+      albumsBar.innerHTML = "";
+
+      albums.forEach(album => {
+        const cover = albumCoverSrc(album.tag);
+        const card = document.createElement("div");
+        card.className = "albumCard";
+
+        card.innerHTML = `
+          ${
+            cover
+              ? `<img class="albumCover" src="${escapeHtml(cover)}" alt="${escapeHtml(album.label)} cover">`
+              : `<div class="albumPlaceholder">No photos yet</div>`
+          }
+          <div class="albumMeta">
+            <div>
+              <strong>${escapeHtml(album.label)}</strong>
+              <span>${counts[album.tag] || 0} photo${(counts[album.tag] || 0) === 1 ? "" : "s"}</span>
+            </div>
+            <div class="albumPill">${escapeHtml(prettyTag(album.tag))}</div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => {
+          setFilter(album.tag);
+          grid.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        albumsBar.appendChild(card);
+      });
+    }
+
+    function updateURLAlbum(tag) {
+      const url = new URL(window.location.href);
+      if (tag === "all") {
+        url.searchParams.delete("album");
+      } else {
+        url.searchParams.set("album", tag);
+      }
+      history.replaceState({}, "", url);
+    }
+
+    function setFilter(tag) {
+      activeFilter = tag;
+      chips.forEach(chip => chip.classList.toggle("active", chip.dataset.tag === tag));
+      updateURLAlbum(tag);
+      render();
+    }
+
+    function setFilterFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const album = params.get("album");
+      if (!album) return;
+
+      const allowed = ["all", "travel", "family", "friends", "nature", "other", "favorites", "public"];
+      if (allowed.includes(album)) {
+        activeFilter = album;
+        chips.forEach(chip => chip.classList.toggle("active", chip.dataset.tag === album));
+      }
+    }
+
+    function matchesFilter(photo) {
+      if (activeFilter === "all") return true;
+      if (activeFilter === "favorites") return photo.isFavorite;
+      if (activeFilter === "public") return photo.visibility === "public";
+      return photo.tag === activeFilter;
+    }
+
+    function matchesSearch(photo, term) {
+      if (!term) return true;
+
+      const haystack = [
+        photo.title,
+        photo.category,
+        photo.desc,
+        photo.tags,
+        photo.locationName,
+        photo.cameraMake,
+        photo.cameraModel,
+        photo.lensModel,
+        photo.visibility,
+        photo.sourceType,
+        photo.takenAt
+      ].join(" ").toLowerCase();
+
+      return haystack.includes(term);
+    }
+
+    function getFilteredPhotos() {
+      const term = searchInput.value.trim().toLowerCase();
+      return photos.filter(photo => matchesFilter(photo) && matchesSearch(photo, term));
+    }
+
+    function updateStats(filteredPhotos) {
+      countText.textContent = `${filteredPhotos.length} photo${filteredPhotos.length === 1 ? "" : "s"}`;
+      favoriteCount.textContent = `Favorites: ${photos.filter(p => p.isFavorite).length}`;
+      publicCount.textContent = `Public: ${photos.filter(p => p.visibility === "public").length}`;
+      uploadCount.textContent = `Uploads: ${photos.filter(p => p.sourceType === "upload").length}`;
+    }
+
+    function render() {
+      const filteredPhotos = getFilteredPhotos();
+      updateStats(filteredPhotos);
+
+      grid.innerHTML = "";
+      emptyState.style.display = filteredPhotos.length ? "none" : "block";
+
+      filteredPhotos.forEach(photo => {
+        const card = document.createElement("article");
+        card.className = "photoCard";
+
+        const tagsLine = photo.tags ? `Tags: ${photo.tags}` : `Visibility: ${photo.visibility}`;
+        const cameraLine = [photo.cameraMake, photo.cameraModel].filter(Boolean).join(" ");
+        const displayImage = photo.src || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='100%25' height='100%25' fill='%23151a2c'/%3E%3Ctext x='50%25' y='50%25' fill='%23b9c3e6' text-anchor='middle' font-size='28' font-family='Arial'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+        card.innerHTML = `
+          <img src="${escapeHtml(displayImage)}" alt="${escapeHtml(photo.title)}">
+          <div class="photoBody">
+            <div class="titleRow">
+              <strong>${escapeHtml(photo.title)}</strong>
+            </div>
+
+            <div class="badgeRow">
+              <span class="badge">${escapeHtml(prettyTag(photo.tag))}</span>
+              <span class="badge ${escapeHtml(photo.visibility)}">${escapeHtml(photo.visibility)}</span>
+              ${photo.isFavorite ? `<span class="badge favorite">Favorite</span>` : ""}
+            </div>
+
+            <div class="photoDesc">${escapeHtml(photo.desc)}</div>
+
+            <div class="miniMeta">
+              ${escapeHtml(tagsLine)}<br>
+              ${escapeHtml(cameraLine || "No camera data")}<br>
+              ${escapeHtml(photo.locationName || photo.uploadedAt || "Saved in database")}
+            </div>
+          </div>
+        `;
+
+        card.addEventListener("click", () => openViewer(photo));
+        grid.appendChild(card);
+      });
+    }
+
+    function openViewer(photo) {
+      currentPhoto = photo;
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+
+      viewImg.src = photo.src || "";
+      viewTitle.textContent = photo.title;
+      viewTag.textContent = `${prettyTag(photo.tag)} • ${photo.category}`;
+      viewDesc.textContent = photo.desc;
+      photoMeta.textContent = getPhotoMetaText(photo);
+      openOriginalBtn.href = photo.src || "#";
+
+      viewerBadges.innerHTML = "";
+      viewerBadges.appendChild(createBadge(prettyTag(photo.tag)));
+      viewerBadges.appendChild(createBadge(photo.visibility, photo.visibility));
+      if (photo.isFavorite) viewerBadges.appendChild(createBadge("Favorite", "favorite"));
+      if (photo.sourceType) viewerBadges.appendChild(createBadge(photo.sourceType));
+
+      viewerMetaGrid.innerHTML = "";
+      viewerMetaGrid.appendChild(createMetaItem("Tags", photo.tags || "None"));
+      viewerMetaGrid.appendChild(createMetaItem("Taken At", photo.takenAt));
+      viewerMetaGrid.appendChild(createMetaItem("Camera Make", photo.cameraMake));
+      viewerMetaGrid.appendChild(createMetaItem("Camera Model", photo.cameraModel));
+      viewerMetaGrid.appendChild(createMetaItem("Lens Model", photo.lensModel));
+      viewerMetaGrid.appendChild(createMetaItem("ISO", photo.iso));
+      viewerMetaGrid.appendChild(createMetaItem("Shutter Speed", photo.shutterSpeed));
+      viewerMetaGrid.appendChild(createMetaItem("Aperture", photo.aperture));
+      viewerMetaGrid.appendChild(createMetaItem("Focal Length", photo.focalLength));
+      viewerMetaGrid.appendChild(createMetaItem("Resolution", formatResolution(photo)));
+      viewerMetaGrid.appendChild(createMetaItem("MIME Type", photo.mimeType || inferFileType(photo.src, photo.mimeType)));
+      viewerMetaGrid.appendChild(createMetaItem("Original Name", photo.originalName || inferFileName(photo.src)));
+      viewerMetaGrid.appendChild(createMetaItem("Location", photo.locationName));
+      viewerMetaGrid.appendChild(createMetaItem("Latitude", photo.latitude));
+      viewerMetaGrid.appendChild(createMetaItem("Longitude", photo.longitude));
+      viewerMetaGrid.appendChild(createMetaItem("Favorite", formatFavorite(photo.isFavorite)));
+      viewerMetaGrid.appendChild(createMetaItem("Visibility", photo.visibility));
+      viewerMetaGrid.appendChild(createMetaItem("Uploaded", photo.uploadedAt));
+      viewerMetaGrid.appendChild(createMetaItem("Updated", photo.updatedAt));
+    }
+
+    function closeViewer() {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      currentPhoto = null;
+    }
+
+    function openEditModal() {
+      if (!currentPhoto) return;
+
+      editTitle.value = currentPhoto.title || "";
+      editCategory.value = mapCategoryToTag(currentPhoto.category);
+      editVisibility.value = currentPhoto.visibility || "private";
+      editTags.value = currentPhoto.tags || "";
+      editDescription.value = currentPhoto.desc || "";
+      editFavorite.checked = !!currentPhoto.isFavorite;
+
+      editOverlay.classList.add("open");
+      editOverlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeEdit() {
+      editOverlay.classList.remove("open");
+      editOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    async function saveCurrentPhotoEdits() {
+      if (!currentPhoto) return;
+
+      const payload = {
+        title: editTitle.value.trim(),
+        description: editDescription.value.trim(),
+        category: editCategory.value,
+        tags: editTags.value.trim(),
+        visibility: editVisibility.value,
+        isFavorite: editFavorite.checked ? 1 : 0
+      };
+
+      if (!payload.title) {
+        showStatus("Title is required.");
+        return;
+      }
+
+      try {
+        saveEditBtn.disabled = true;
+        saveEditBtn.textContent = "Saving...";
+
+        const response = await fetch(`/api/photos/${currentPhoto.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await readJsonSafe(response);
+
+        if (!response.ok) {
+          showStatus(result.error || "Failed to update photo.");
+          return;
+        }
+
+        const updatedPhoto = normalizePhoto(result.photo || {
+          ...currentPhoto,
+          ...payload,
+          imageUrl: currentPhoto.src,
+          createdAt: currentPhoto.uploadedAt,
+          updatedAt: new Date().toISOString()
+        });
+
+        photos = photos.map(photo => photo.id === currentPhoto.id ? updatedPhoto : photo);
+        currentPhoto = updatedPhoto;
+
+        buildAlbums();
+        render();
+        openViewer(updatedPhoto);
+        closeEdit();
+        showStatus("Photo updated successfully.");
+      } catch (error) {
+        showStatus("Could not save photo changes.");
+      } finally {
+        saveEditBtn.disabled = false;
+        saveEditBtn.textContent = "Save Changes";
+      }
+    }
+
+    async function deleteCurrentPhoto() {
+      if (!currentPhoto) return;
+
+      const confirmed = window.confirm(`Delete "${currentPhoto.title}"?`);
+      if (!confirmed) return;
+
+      try {
+        const response = await fetch(`/api/photos/${currentPhoto.id}`, {
+          method: "DELETE"
+        });
+
+        const result = await readJsonSafe(response);
+
+        if (!response.ok) {
+          showStatus(result.error || "Failed to delete photo.");
+          return;
+        }
+
+        photos = photos.filter(photo => photo.id !== currentPhoto.id);
+        buildAlbums();
+        render();
+        closeViewer();
+        showStatus("Photo deleted successfully.");
+      } catch (error) {
+        showStatus("Could not delete photo.");
+      }
+    }
+
+    function showUploadedMessageIfNeeded() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("uploaded") === "1") {
+        showStatus("Photo saved successfully and added to the gallery.");
+        params.delete("uploaded");
+        const url = new URL(window.location.href);
+        url.search = params.toString();
+        history.replaceState({}, "", url);
+      }
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        setFilter(chip.dataset.tag);
+      });
+    });
+
+    searchInput.addEventListener("input", render);
+
+    sortSelect.addEventListener("change", () => {
+      fetchPhotos();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      sortSelect.value = "newest";
+      setFilter("all");
+      fetchPhotos();
+    });
+
+    closeLightbox.addEventListener("click", closeViewer);
+    deleteBtn.addEventListener("click", deleteCurrentPhoto);
+    editBtn.addEventListener("click", openEditModal);
+
+    closeEditModal.addEventListener("click", closeEdit);
+    cancelEditBtn.addEventListener("click", closeEdit);
+    saveEditBtn.addEventListener("click", saveCurrentPhotoEdits);
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeViewer();
+    });
+
+    editOverlay.addEventListener("click", (e) => {
+      if (e.target === editOverlay) closeEdit();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (editOverlay.classList.contains("open")) {
+          closeEdit();
+          return;
+        }
+        if (lightbox.classList.contains("open")) {
+          closeViewer();
+        }
+      }
+    });
+
+    customizeBtn.addEventListener("click", () => {
+      customizePanel.classList.toggle("open");
+    });
+
+    closeCustomize.addEventListener("click", () => {
+      customizePanel.classList.remove("open");
+    });
+
+    function setAccentColors(a1, a2) {
+      document.documentElement.style.setProperty("--accent", a1);
+      document.documentElement.style.setProperty("--accent2", a2);
+      localStorage.setItem("galleryAccent1", a1);
+      localStorage.setItem("galleryAccent2", a2);
+      accentPicker.value = a1;
+      accentPicker2.value = a2;
+    }
+
+    accentPicker.addEventListener("input", () => {
+      setAccentColors(accentPicker.value, accentPicker2.value);
+    });
+
+    accentPicker2.addEventListener("input", () => {
+      setAccentColors(accentPicker.value, accentPicker2.value);
+    });
+
+    resetTheme.addEventListener("click", () => {
+      setAccentColors("#00d4ff", "#6a5cff");
+    });
+
+    randomBtn.addEventListener("click", () => {
+      const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0")}`;
+      setAccentColors(randomHex(), randomHex());
+    });
+
+    (function loadSavedAccent() {
+      const a1 = localStorage.getItem("galleryAccent1");
+      const a2 = localStorage.getItem("galleryAccent2");
+      if (a1 && a2) {
+        setAccentColors(a1, a2);
+      }
+    })();
+
+    fetchPhotos();
+  </script>
+
+  <script src="theme.js"></script>
+</body>
+</html>

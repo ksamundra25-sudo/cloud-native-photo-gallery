@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Albums • My Photo Gallery</title>
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    :root {
+      --bg1: #0b1020;
+      --bg2: #121a31;
+      --card: rgba(255,255,255,0.08);
+      --line: rgba(255,255,255,0.14);
+      --text: #f5f7ff;
+      --muted: #b9c3e6;
+      --accent: #00d4ff;
+      --accent2: #6a5cff;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0,212,255,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(106,92,255,0.16), transparent 22%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: var(--shadow);
+    }
+
+    .navlinks,
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .navlinks a,
+    .btn,
+    button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: 0.2s ease;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .navlinks a:hover,
+    .btn:hover,
+    button:hover {
+      transform: translateY(-1px);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -1px;
+      line-height: 1.05;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .pillRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .summaryGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .summaryCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .summaryCard .label {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .summaryCard .value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      flex: 1 1 220px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      font: inherit;
+    }
+
+    .toolbar input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .statusBox {
+      margin-bottom: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.06);
+      display: none;
+    }
+
+    .statusBox.show {
+      display: block;
+    }
+
+    .albumGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .albumCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      border-radius: 22px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: 0.2s ease;
+    }
+
+    .albumCard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .albumCover {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background:
+        radial-gradient(circle at top left, rgba(0,212,255,0.2), transparent 35%),
+        linear-gradient(135deg, rgba(106,92,255,0.38), rgba(0,212,255,0.18));
+    }
+
+    .albumBody {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .albumTop {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .albumTop strong {
+      font-size: 1.05rem;
+      line-height: 1.35;
+      display: block;
+    }
+
+    .albumTop span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .albumPill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 11px;
+      color: rgba(234,240,255,0.92);
+      font-weight: 800;
+      white-space: nowrap;
+      font-size: 0.84rem;
+    }
+
+    .albumMeta {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .badgeRow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: rgba(234,240,255,0.92);
+    }
+
+    .emptyState {
+      border: 1px dashed rgba(255,255,255,0.22);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      display: none;
+    }
+
+    .helperSection {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .helperCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .helperCard h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .helperCard p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .customizePanel {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: min(360px, 92vw);
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: none;
+      z-index: 999;
+    }
+
+    .customizePanel.open { display: block; }
+
+    .customizeRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .customizeRow input[type="color"] {
+      width: 54px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: transparent;
+    }
+
+    .customizeActions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    footer {
+      margin-top: 26px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        width: min(100% - 20px, 1220px);
+      }
+
+      .summaryGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div>My Photo Gallery</div>
+          <div style="color: var(--muted); font-weight: 500; font-size: 0.9rem;">Albums</div>
+        </div>
+      </div>
+
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="home.html">Home</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="albums.html" style="color: var(--text); background: rgba(255,255,255,0.08);">Albums</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="features.html">Features</a>
+      </nav>
+
+      <div class="actions">
+        <a class="btn" href="home.html">Back Home</a>
+        <a class="btn primary" href="gallery.html">Open Gallery</a>
+        <button class="btn" id="themeToggle" type="button">Light mode</button>
+        <button class="btn" id="customizeBtn" type="button">Customize</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <article class="card">
+        <h1>Albums powered by your backend</h1>
+        <p class="muted" style="margin-top: 10px;">
+          This page now builds albums from your stored photos instead of showing only static cards.
+          Each album opens the gallery with a matching filter so the flow stays connected.
+        </p>
+
+        <div class="pillRow">
+          <div class="pill">Dynamic albums</div>
+          <div class="pill">Backend connected</div>
+          <div class="pill">Category grouping</div>
+          <div class="pill">Metadata aware</div>
+        </div>
+      </article>
+
+      <aside class="card">
+        <div class="summaryGrid">
+          <div class="summaryCard">
+            <div class="label">Albums Found</div>
+            <div class="value" id="albumCount">0</div>
+          </div>
+          <div class="summaryCard">
+            <div class="label">Photos in Albums</div>
+            <div class="value" id="photoCount">0</div>
+          </div>
+          <div class="summaryCard">
+            <div class="label">Favorite Photos</div>
+            <div class="value" id="favoriteCount">0</div>
+          </div>
+          <div class="summaryCard">
+            <div class="label">Public Photos</div>
+            <div class="value" id="publicCount">0</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="toolbar">
+      <input id="searchInput" type="text" placeholder="Search album name, category, tags, or cover photo title..." />
+      <select id="sortSelect">
+        <option value="count_desc">Most photos first</option>
+        <option value="count_asc">Fewest photos first</option>
+        <option value="name_asc">Album name A–Z</option>
+        <option value="name_desc">Album name Z–A</option>
+      </select>
+      <button class="btn" id="clearBtn" type="button">Clear</button>
+    </section>
+
+    <div class="statusBox" id="statusBox"></div>
+
+    <section class="albumGrid" id="albumGrid"></section>
+
+    <div class="emptyState" id="emptyState">
+      No albums match your current search.
+    </div>
+
+    <section class="helperSection">
+      <div class="helperCard">
+        <h3>How albums are created</h3>
+        <p>Albums are grouped from the photo category field in your database. If a photo has no category, it goes into “Uncategorized”.</p>
+      </div>
+      <div class="helperCard">
+        <h3>How album links work</h3>
+        <p>Each card opens <b>gallery.html</b> with an album filter in the URL, so users jump straight into that category view.</p>
+      </div>
+      <div class="helperCard">
+        <h3>What helps album quality</h3>
+        <p>Adding categories, titles, tags, and favorites in upload form makes this page much more useful and organized.</p>
+      </div>
+    </section>
+
+    <footer>
+      © 2026 • My Photo Gallery Project • Dynamic albums page
+    </footer>
+  </div>
+
+  <div class="customizePanel" id="customizePanel">
+    <h3 style="margin:0;">Customize</h3>
+    <div style="color:var(--muted); font-size:0.95rem;">Pick accent colors. Saved automatically.</div>
+
+    <div class="customizeRow">
+      <label for="accentPicker" style="font-weight:800;">Accent 1</label>
+      <input id="accentPicker" type="color" value="#00d4ff">
+    </div>
+
+    <div class="customizeRow">
+      <label for="accentPicker2" style="font-weight:800;">Accent 2</label>
+      <input id="accentPicker2" type="color" value="#6a5cff">
+    </div>
+
+    <div class="customizeActions">
+      <button class="btn primary" id="closeCustomize" type="button">Done</button>
+      <button class="btn" id="resetTheme" type="button">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    const albumGrid = document.getElementById("albumGrid");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const sortSelect = document.getElementById("sortSelect");
+    const clearBtn = document.getElementById("clearBtn");
+    const statusBox = document.getElementById("statusBox");
+
+    const albumCount = document.getElementById("albumCount");
+    const photoCount = document.getElementById("photoCount");
+    const favoriteCount = document.getElementById("favoriteCount");
+    const publicCount = document.getElementById("publicCount");
+
+    const customizeBtn = document.getElementById("customizeBtn");
+    const customizePanel = document.getElementById("customizePanel");
+    const closeCustomize = document.getElementById("closeCustomize");
+    const resetTheme = document.getElementById("resetTheme");
+    const accentPicker = document.getElementById("accentPicker");
+    const accentPicker2 = document.getElementById("accentPicker2");
+
+    let photos = [];
+    let albums = [];
+
+    function showStatus(message) {
+      statusBox.textContent = message;
+      statusBox.classList.add("show");
+    }
+
+    function hideStatus() {
+      statusBox.textContent = "";
+      statusBox.classList.remove("show");
+    }
+
+    function safeText(value, fallback = "Unknown") {
+      if (value === null || value === undefined || value === "") return fallback;
+      return String(value);
+    }
+
+    function normalizeCategory(category) {
+      const value = (category || "").trim().toLowerCase();
+      return value || "uncategorized";
+    }
+
+    function prettyCategory(category) {
+      const value = normalizeCategory(category);
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function buildGalleryLink(categoryKey) {
+      if (categoryKey === "uncategorized") {
+        return `gallery.html?search=${encodeURIComponent("uncategorized")}`;
+      }
+      return `gallery.html?album=${encodeURIComponent(categoryKey)}`;
+    }
+
+    function sortAlbums(items) {
+      const sort = sortSelect.value;
+
+      return [...items].sort((a, b) => {
+        if (sort === "count_asc") return a.count - b.count;
+        if (sort === "name_asc") return a.name.localeCompare(b.name);
+        if (sort === "name_desc") return b.name.localeCompare(a.name);
+        return b.count - a.count;
+      });
+    }
+
+    function groupAlbums(allPhotos) {
+      const map = new Map();
+
+      allPhotos.forEach(photo => {
+        const key = normalizeCategory(photo.category);
+
+        if (!map.has(key)) {
+          map.set(key, {
+            key,
+            name: prettyCategory(key),
+            count: 0,
+            favorites: 0,
+            publicCount: 0,
+            latestTitle: "",
+            latestTags: "",
+            cover: photo.imageUrl || "",
+            photos: []
+          });
+        }
+
+        const album = map.get(key);
+        album.count += 1;
+        album.photos.push(photo);
+
+        if (Number(photo.isFavorite) === 1) album.favorites += 1;
+        if ((photo.visibility || "").toLowerCase() === "public") album.publicCount += 1;
+
+        if (!album.latestTitle) album.latestTitle = photo.title || "Untitled";
+        if (!album.latestTags) album.latestTags = photo.tags || "";
+        if (!album.cover && photo.imageUrl) album.cover = photo.imageUrl;
+      });
+
+      return Array.from(map.values());
+    }
+
+    function renderAlbums() {
+      const q = searchInput.value.trim().toLowerCase();
+
+      const filtered = sortAlbums(albums).filter(album => {
+        const haystack = [
+          album.name,
+          album.key,
+          album.latestTitle,
+          album.latestTags
+        ].join(" ").toLowerCase();
+
+        return haystack.includes(q);
+      });
+
+      albumGrid.innerHTML = "";
+      emptyState.style.display = filtered.length ? "none" : "block";
+
+      filtered.forEach(album => {
+        const cover = album.cover || "https://picsum.photos/800/500?blur=2";
+        const link = buildGalleryLink(album.key);
+
+        const card = document.createElement("a");
+        card.className = "albumCard";
+        card.href = link;
+
+        card.innerHTML = `
+          <img class="albumCover" src="${cover}" alt="${album.name} cover">
+          <div class="albumBody">
+            <div class="albumTop">
+              <div>
+                <strong>${album.name}</strong>
+                <span>${album.count} photo${album.count === 1 ? "" : "s"} in this album</span>
+              </div>
+              <div class="albumPill">${album.name}</div>
+            </div>
+
+            <div class="albumMeta">
+              <div><b>Latest photo:</b> ${safeText(album.latestTitle, "Untitled")}</div>
+              <div><b>Tags:</b> ${safeText(album.latestTags, "None")}</div>
+            </div>
+
+            <div class="badgeRow">
+              <span class="badge">${album.count} items</span>
+              <span class="badge">${album.favorites} favorites</span>
+              <span class="badge">${album.publicCount} public</span>
+            </div>
+          </div>
+        `;
+
+        albumGrid.appendChild(card);
+      });
+    }
+
+    function updateSummary() {
+      albumCount.textContent = albums.length;
+      photoCount.textContent = photos.length;
+      favoriteCount.textContent = photos.filter(photo => Number(photo.isFavorite) === 1).length;
+      publicCount.textContent = photos.filter(photo => (photo.visibility || "").toLowerCase() === "public").length;
+    }
+
+    async function fetchAlbums() {
+      try {
+        hideStatus();
+
+        const response = await fetch("/api/photos?sort=newest");
+        if (!response.ok) {
+          throw new Error("Failed to load photos");
+        }
+
+        photos = await response.json();
+        albums = groupAlbums(photos);
+
+        updateSummary();
+        renderAlbums();
+
+        if (!photos.length) {
+          showStatus("No photos found yet. Upload photos with categories to build albums.");
+        }
+      } catch (error) {
+        photos = [];
+        albums = [];
+        updateSummary();
+        renderAlbums();
+        showStatus("Could not load albums from the backend.");
+      }
+    }
+
+    searchInput.addEventListener("input", renderAlbums);
+    sortSelect.addEventListener("change", renderAlbums);
+
+    clearBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      sortSelect.value = "count_desc";
+      renderAlbums();
+    });
+
+    customizeBtn.addEventListener("click", () => {
+      customizePanel.classList.toggle("open");
+    });
+
+    closeCustomize.addEventListener("click", () => {
+      customizePanel.classList.remove("open");
+    });
+
+    function setAccentColors(a1, a2) {
+      document.documentElement.style.setProperty("--accent", a1);
+      document.documentElement.style.setProperty("--accent2", a2);
+      localStorage.setItem("galleryAccent1", a1);
+      localStorage.setItem("galleryAccent2", a2);
+      accentPicker.value = a1;
+      accentPicker2.value = a2;
+    }
+
+    accentPicker.addEventListener("input", () => {
+      setAccentColors(accentPicker.value, accentPicker2.value);
+    });
+
+    accentPicker2.addEventListener("input", () => {
+      setAccentColors(accentPicker.value, accentPicker2.value);
+    });
+
+    resetTheme.addEventListener("click", () => {
+      setAccentColors("#00d4ff", "#6a5cff");
+    });
+
+    (function loadSavedAccent() {
+      const a1 = localStorage.getItem("galleryAccent1");
+      const a2 = localStorage.getItem("galleryAccent2");
+      if (a1 && a2) {
+        setAccentColors(a1, a2);
+      }
+    })();
+
+    fetchAlbums();
+  </script>
+
+  <script src="theme.js"></script>
+</body>
+</html>

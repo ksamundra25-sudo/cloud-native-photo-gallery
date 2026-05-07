@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Photo Gallery</title>
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    :root {
+      --bg1: #0b1020;
+      --bg2: #121a31;
+      --card: rgba(255,255,255,0.08);
+      --line: rgba(255,255,255,0.14);
+      --text: #f5f7ff;
+      --muted: #b9c3e6;
+      --accent: #00d4ff;
+      --accent2: #6a5cff;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0,212,255,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(106,92,255,0.16), transparent 22%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: var(--shadow);
+    }
+
+    .navlinks,
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .navlinks a,
+    .btn,
+    button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      text-decoration: none;
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: 0.2s ease;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .navlinks a:hover,
+    .btn:hover,
+    button:hover {
+      transform: translateY(-1px);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 4vw, 3.4rem);
+      letter-spacing: -1px;
+      line-height: 1.05;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .heroActions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .pillRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .statsGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .statCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .statLabel {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .statValue {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .sectionHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .sectionHead h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.4px;
+    }
+
+    .quickGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .quickCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 18px;
+      transition: 0.2s ease;
+    }
+
+    .quickCard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .quickCard h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .quickCard p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .latestGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .photoCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .photoCard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .photoCard img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .photoBody {
+      padding: 14px;
+    }
+
+    .photoTitle {
+      font-weight: 800;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .photoMeta {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .badgeRow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: rgba(234,240,255,0.92);
+    }
+
+    .emptyState {
+      border: 1px dashed rgba(255,255,255,0.22);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .featureGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .featureCard {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .featureCard h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .featureCard p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    footer {
+      margin-top: 26px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        width: min(100% - 20px, 1200px);
+      }
+
+      .statsGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div>My Photo Gallery</div>
+          <div style="color: var(--muted); font-weight: 500; font-size: 0.9rem;">Home</div>
+        </div>
+      </div>
+
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="home.html" style="color: var(--text); background: rgba(255,255,255,0.08);">Home</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="albums.html">Albums</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="actions">
+        <a class="btn primary" href="upload.html">Upload Photo</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <article class="card">
+        <h1>Store, organize, and explore your photo collection</h1>
+        <p class="muted" style="margin-top: 12px;">
+          Upload photos, save images by URL, manage metadata, and browse everything from one clean gallery.
+          Your homepage now connects to the backend and shows real photo stats and recent uploads.
+        </p>
+
+        <div class="heroActions">
+          <a class="btn primary" href="upload.html">Start Uploading</a>
+          <a class="btn" href="gallery.html">Open Gallery</a>
+          <a class="btn" href="albums.html">View Albums</a>
+        </div>
+
+        <div class="pillRow">
+          <div class="pill">Backend connected</div>
+          <div class="pill">Metadata ready</div>
+          <div class="pill">Gallery API live</div>
+          <div class="pill">SQLite powered</div>
+        </div>
+      </article>
+
+      <aside class="card">
+        <div class="sectionHead" style="margin-bottom: 16px;">
+          <h2 style="margin:0;">Quick Stats</h2>
+        </div>
+
+        <div class="statsGrid">
+          <div class="statCard">
+            <div class="statLabel">Total Photos</div>
+            <div class="statValue" id="totalPhotos">0</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Favorites</div>
+            <div class="statValue" id="favoritePhotos">0</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Public Photos</div>
+            <div class="statValue" id="publicPhotos">0</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statLabel">Uploads</div>
+            <div class="statValue" id="uploadPhotos">0</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="sectionHead">
+        <h2>Quick Actions</h2>
+      </div>
+
+      <div class="quickGrid">
+        <a class="quickCard" href="upload.html" style="text-decoration:none; color:inherit;">
+          <h3>Add a new photo</h3>
+          <p>Upload from your device or save an image by URL with metadata fields.</p>
+        </a>
+
+        <a class="quickCard" href="gallery.html" style="text-decoration:none; color:inherit;">
+          <h3>Browse your gallery</h3>
+          <p>Search, filter, and open your saved photos with full metadata support.</p>
+        </a>
+
+        <a class="quickCard" href="albums.html" style="text-decoration:none; color:inherit;">
+          <h3>Explore albums</h3>
+          <p>Group photos visually and move through your collection by category.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectionHead">
+        <h2>Latest Photos</h2>
+        <a class="btn" href="gallery.html">See All</a>
+      </div>
+
+      <div class="latestGrid" id="latestPhotosGrid"></div>
+      <div class="emptyState" id="latestEmpty" style="display:none;">
+        No photos yet. Upload your first photo to see it here.
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sectionHead">
+        <h2>What this site supports</h2>
+      </div>
+
+      <div class="featureGrid">
+        <div class="featureCard">
+          <h3>Rich metadata</h3>
+          <p>Store tags, camera data, visibility, favorites, dates, and location details.</p>
+        </div>
+
+        <div class="featureCard">
+          <h3>Backend-powered gallery</h3>
+          <p>Photos are loaded from your Express API and stored in SQLite through the backend.</p>
+        </div>
+
+        <div class="featureCard">
+          <h3>Flexible photo sources</h3>
+          <p>Save images from your device or add them directly using an image URL.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © 2026 • My Photo Gallery Project • Home page connected to backend
+    </footer>
+  </div>
+
+  <script>
+    const totalPhotos = document.getElementById("totalPhotos");
+    const favoritePhotos = document.getElementById("favoritePhotos");
+    const publicPhotos = document.getElementById("publicPhotos");
+    const uploadPhotos = document.getElementById("uploadPhotos");
+    const latestPhotosGrid = document.getElementById("latestPhotosGrid");
+    const latestEmpty = document.getElementById("latestEmpty");
+
+    function safeText(value, fallback = "Unknown") {
+      if (value === null || value === undefined || value === "") return fallback;
+      return String(value);
+    }
+
+    function mapCategory(category) {
+      if (!category) return "Uncategorized";
+      return category.charAt(0).toUpperCase() + category.slice(1);
+    }
+
+    function renderLatestPhotos(photos) {
+      latestPhotosGrid.innerHTML = "";
+
+      if (!photos.length) {
+        latestEmpty.style.display = "block";
+        return;
+      }
+
+      latestEmpty.style.display = "none";
+
+      photos.slice(0, 4).forEach(photo => {
+        const card = document.createElement("a");
+        card.className = "photoCard";
+        card.href = `gallery.html`;
+        card.innerHTML = `
+          <img src="${photo.imageUrl}" alt="${safeText(photo.title, "Photo")}">
+          <div class="photoBody">
+            <div class="photoTitle">${safeText(photo.title, "Untitled")}</div>
+            <div class="photoMeta">
+              ${mapCategory(photo.category)}<br>
+              ${safeText(photo.description, "No description")}<br>
+              ${safeText(photo.createdAt, "Saved in database")}
+            </div>
+            <div class="badgeRow">
+              <span class="badge">${mapCategory(photo.category)}</span>
+              <span class="badge">${safeText(photo.visibility, "private")}</span>
+              ${Number(photo.isFavorite) === 1 ? `<span class="badge">Favorite</span>` : ""}
+            </div>
+          </div>
+        `;
+        latestPhotosGrid.appendChild(card);
+      });
+    }
+
+    async function loadHomeData() {
+      try {
+        const response = await fetch("/api/photos?sort=newest");
+        if (!response.ok) {
+          throw new Error("Failed to load photos");
+        }
+
+        const photos = await response.json();
+
+        totalPhotos.textContent = photos.length;
+        favoritePhotos.textContent = photos.filter(photo => Number(photo.isFavorite) === 1).length;
+        publicPhotos.textContent = photos.filter(photo => photo.visibility === "public").length;
+        uploadPhotos.textContent = photos.filter(photo => photo.sourceType === "upload").length;
+
+        renderLatestPhotos(photos);
+      } catch (error) {
+        totalPhotos.textContent = "0";
+        favoritePhotos.textContent = "0";
+        publicPhotos.textContent = "0";
+        uploadPhotos.textContent = "0";
+        latestPhotosGrid.innerHTML = "";
+        latestEmpty.style.display = "block";
+        latestEmpty.textContent = "Could not load homepage data from the backend.";
+      }
+    }
+
+    loadHomeData();
+  </script>
+
+  <script src="theme.js"></script>
+</body>
+</html>
